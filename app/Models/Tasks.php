@@ -59,13 +59,13 @@ class Tasks extends Model
      * @param array $developers Array containing mapped developer information
      * @param array $tasks Array containing tasks information
      * @param array $oneWeekWorkLimit Work limit
-     * @return array Array containing mapped developers data
+     * @return void
      */
     public function calculate(&$sprint, &$developers, &$tasks, $oneWeekWorkLimit): void
     {
+        $totalWorkDuration = $sprint * $oneWeekWorkLimit;
 
-        foreach ($tasks as $key => &$task) {
-            $totalWorkDuration = $sprint * $oneWeekWorkLimit;
+        foreach ($tasks as $key => $task) {
             if (
                 $totalWorkDuration > $developers[$task['difficulty']]['total_duration']
                 && $totalWorkDuration >= ($developers[$task['difficulty']]['total_duration'] + $task['duration'])
@@ -76,8 +76,41 @@ class Tasks extends Model
             }
         }
 
+        $this->fillBlankHours(
+            $sprint,
+            $developers,
+            $tasks,
+            $totalWorkDuration
+        );
+
         if (!empty($tasks)) {
             $sprint++; // End of sprint (sprint == week)
+        }
+    }
+
+    /**
+     * Planning sprint/work.
+     *
+     * @param int $sprint Sprint information
+     * @param array $developers Array containing mapped developer information
+     * @param array $tasks Array containing tasks information
+     * @param int $totalWorkDuration Work limit
+     * @return void
+     */
+    public function fillBlankHours(&$sprint, &$developers, &$tasks, $totalWorkDuration): void
+    {
+        foreach ($developers as &$developer) {
+            if ($totalWorkDuration >= $developer['total_duration']) {
+                foreach ($tasks as $key => $task) {
+                    $partOfTaskDuration = $task['difficulty'] * $task['duration'] / $developer['difficulty_level'];
+                    if ($partOfTaskDuration + $developer['total_duration'] <= $totalWorkDuration) {
+                        $developer['total_duration'] += $partOfTaskDuration;
+                        $developer['sprints'][$sprint][] = $task;
+
+                        unset($tasks[$key]);
+                    }
+                }
+            }
         }
     }
 }

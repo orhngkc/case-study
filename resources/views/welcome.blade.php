@@ -106,7 +106,7 @@
             <div class="d-flex align-items-center justify-content-center p-3 my-1 text-white bg-purple rounded shadow-sm">
                 <div class="lh-1">
                     <h1 class="h5 mb-0 text-white lh-1">The sprint will be completed in <b
-                            class="text-bolder">{{$sprint}}</b> days</h1>
+                            class="text-bolder">{{$sprint}}</b> weeks/sprints</h1>
                 </div>
             </div>
 

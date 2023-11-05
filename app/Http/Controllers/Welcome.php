@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use DB;
 use Illuminate\Routing\Controller as BaseController;
 
 class Welcome extends BaseController
@@ -21,7 +22,7 @@ class Welcome extends BaseController
     {
         $developers = $this->developersModel::all()->toArray();
         $tasks = $this->tasksModel::all()->toArray();
-        
+
         list($developers, $sprint) = $this->tasksModel->sprintPlanner(
             $tasks,
             $developers,
